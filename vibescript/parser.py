@@ -233,18 +233,20 @@ class Parser:
         elif token.type in (TOKEN_TYPES['LIT'], TOKEN_TYPES['TEA'], TOKEN_TYPES['MOOD'], TOKEN_TYPES['STAN']):
             return self.variable_declaration()
         elif token.type == TOKEN_TYPES['IDENTIFIER']:
-            # Look ahead to see if this is an assignment
-            next_pos = self.lexer.pos
-            next_char = self.lexer.current_char
-            next_line = self.lexer.line
-            next_col = self.lexer.column
+            # Simple lookahead for assignment by checking the next character
+            current_pos = self.lexer.pos
+            # Look for '=' character after the identifier
+            temp_text = self.lexer.text[current_pos:]
+            has_assign = '=' in temp_text.split(';')[0] and temp_text.split(';')[0].strip().endswith('=') is False and '=' in temp_text.split(';')[0].split()[0:2]
             
-            # Simple lookahead for assignment
-            temp_lexer = self.lexer.__class__(self.lexer.text[self.lexer.pos-len(token.value):])
-            temp_lexer.get_next_token()  # Skip identifier
-            next_token = temp_lexer.get_next_token()
+            # More reliable check: peek ahead for assignment
+            peek_ahead = ""
+            temp_pos = current_pos
+            while temp_pos < len(self.lexer.text) and self.lexer.text[temp_pos] not in [';', '\n']:
+                peek_ahead += self.lexer.text[temp_pos]
+                temp_pos += 1
             
-            if next_token.type == TOKEN_TYPES['ASSIGN']:
+            if '=' in peek_ahead and not '==' in peek_ahead and not '!=' in peek_ahead and not '>=' in peek_ahead and not '<=' in peek_ahead:
                 return self.assignment_statement()
             else:
                 return self.expression_statement()

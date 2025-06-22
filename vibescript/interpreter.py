@@ -148,9 +148,14 @@ class Interpreter:
     
     def execute_InputStatement(self, node):
         """Execute an InputStatement node (vibe_check)"""
-        # In web context, we don't support interactive input yet
-        # For now, just set the variable to an empty string
-        self.environment.define(node.variable, "")
+        # In web context, we simulate input with a prompt message
+        # For now, just set the variable to a default value and show a message
+        default_value = "user_input"
+        self.environment.assign(node.variable, default_value)
+        
+        # Show a message in output that input was requested
+        self.output_stream.write(f"[INPUT REQUESTED for '{node.variable}' - defaulted to '{default_value}']\n")
+        self.output = self.output_stream.getvalue()
     
     def execute_VariableDeclaration(self, node):
         """Execute a VariableDeclaration node"""
