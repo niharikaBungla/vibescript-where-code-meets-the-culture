@@ -118,14 +118,11 @@ class Interpreter:
     
     def interpret(self):
         """Interpret the program"""
-        try:
-            # Parse the program
-            program = self.parser.parse()
-            
-            # Execute the program
-            return self.execute(program)
-        except Exception as e:
-            self.error(str(e))
+        # Parse the program
+        program = self.parser.parse()
+        
+        # Execute the program
+        return self.execute(program)
     
     def execute(self, node):
         """Execute a node in the AST"""

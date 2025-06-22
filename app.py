@@ -41,22 +41,23 @@ def run_code():
         # Set any provided inputs
         interpreter.input_values = inputs
         
-        # Capture the output using the interpreter's output collector
-        interpreter.interpret()
+        try:
+            # Capture the output using the interpreter's output collector
+            interpreter.interpret()
+            
+            return jsonify({
+                'output': interpreter.output.strip() if interpreter.output else 'Code executed successfully (no output)',
+                'error': None
+            })
         
-        return jsonify({
-            'output': interpreter.output.strip() if interpreter.output else 'Code executed successfully (no output)',
-            'error': None
-        })
-    
-    except InputRequestException as e:
-        # Return a special response indicating input is needed
-        return jsonify({
-            'input_requested': True,
-            'variable_name': e.variable_name,
-            'output': '',
-            'error': None
-        })
+        except InputRequestException as e:
+            # Return a special response indicating input is needed
+            return jsonify({
+                'input_requested': True,
+                'variable_name': e.variable_name,
+                'output': '',
+                'error': None
+            })
     
     except Exception as e:
         logger.exception("Error executing code")
