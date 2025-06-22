@@ -4,7 +4,7 @@ import traceback
 from flask import Flask, render_template, request, jsonify
 from vibescript.lexer import Lexer
 from vibescript.parser import Parser
-from vibescript.interpreter import Interpreter
+from vibescript.interpreter import Interpreter, InputRequestException
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
@@ -23,9 +23,10 @@ def index():
 def run_code():
     """Execute VibeScript code and return the results"""
     try:
-        # Get code from request
+        # Get code and inputs from request
         data = request.get_json()
         code = data.get('code', '') if data else ''
+        inputs = data.get('inputs', {}) if data else {}
         
         if not code.strip():
             return jsonify({'output': 'No code to execute!', 'error': None})
@@ -37,11 +38,23 @@ def run_code():
         parser = Parser(lexer)
         interpreter = Interpreter(parser)
         
+        # Set any provided inputs
+        interpreter.input_values = inputs
+        
         # Capture the output using the interpreter's output collector
         interpreter.interpret()
         
         return jsonify({
             'output': interpreter.output.strip() if interpreter.output else 'Code executed successfully (no output)',
+            'error': None
+        })
+    
+    except InputRequestException as e:
+        # Return a special response indicating input is needed
+        return jsonify({
+            'input_requested': True,
+            'variable_name': e.variable_name,
+            'output': '',
             'error': None
         })
     

@@ -15,6 +15,13 @@ class InterpreterError(Exception):
         self.message = message
         super().__init__(message)
 
+class InputRequestException(Exception):
+    """Exception raised when input is requested from user"""
+    
+    def __init__(self, variable_name):
+        self.variable_name = variable_name
+        super().__init__(f"Input requested for variable: {variable_name}")
+
 class SymbolTable:
     """Symbol table for storing variables and functions"""
     
@@ -103,6 +110,7 @@ class Interpreter:
         self.environment = SymbolTable()
         self.output_stream = StringIO()
         self.output = ""
+        self.input_values = {}
     
     def error(self, message):
         """Raise an interpreter error"""
@@ -148,14 +156,16 @@ class Interpreter:
     
     def execute_InputStatement(self, node):
         """Execute an InputStatement node (vibe_check)"""
-        # In web context, we simulate input with a prompt message
-        # For now, just set the variable to a default value and show a message
-        default_value = "user_input"
-        self.environment.assign(node.variable, default_value)
-        
-        # Show a message in output that input was requested
-        self.output_stream.write(f"[INPUT REQUESTED for '{node.variable}' - defaulted to '{default_value}']\n")
-        self.output = self.output_stream.getvalue()
+        # Check if we have a pre-provided input value
+        if hasattr(self, 'input_values') and node.variable in self.input_values:
+            value = self.input_values[node.variable]
+            self.environment.assign(node.variable, value)
+            # Show what input was used
+            self.output_stream.write(f"Input for '{node.variable}': {value}\n")
+            self.output = self.output_stream.getvalue()
+        else:
+            # Request input from user
+            raise InputRequestException(node.variable)
     
     def execute_VariableDeclaration(self, node):
         """Execute a VariableDeclaration node"""

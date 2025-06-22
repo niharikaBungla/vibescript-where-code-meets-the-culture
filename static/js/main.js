@@ -5,7 +5,7 @@
  */
 
 // Execute the code in the editor
-function runCode() {
+function runCode(inputs = {}) {
   const code = getCode();
   const consoleOutput = document.getElementById('console-output');
   
@@ -14,8 +14,10 @@ function runCode() {
     return;
   }
   
-  // Clear previous output
-  consoleOutput.innerHTML = '';
+  // Clear previous output if this is the first run (no inputs)
+  if (Object.keys(inputs).length === 0) {
+    consoleOutput.innerHTML = '';
+  }
   
   // Disable run button during execution
   const runButton = document.getElementById('run-button');
@@ -30,10 +32,19 @@ function runCode() {
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ code: code }),
+    body: JSON.stringify({ 
+      code: code,
+      inputs: inputs 
+    }),
   })
   .then(response => response.json())
   .then(data => {
+    // Handle input request
+    if (data.input_requested) {
+      handleInputRequest(data.variable_name, inputs);
+      return;
+    }
+    
     // Display output or error in console only
     if (data.error) {
       consoleOutput.innerHTML = `<div class="error-output"><i class="bi bi-exclamation-triangle-fill me-2"></i>${data.error}</div>`;
@@ -55,6 +66,72 @@ function runCode() {
       runButton.innerHTML = '<i class="bi bi-play-fill me-2"></i>Run';
     }
   });
+}
+
+// Handle input requests from the interpreter
+function handleInputRequest(variableName, currentInputs) {
+  const consoleOutput = document.getElementById('console-output');
+  
+  // Create input prompt in console
+  const inputPrompt = document.createElement('div');
+  inputPrompt.style.cssText = 'background-color: #2d2d30; padding: 10px; margin: 5px 0; border-left: 3px solid #007ACC;';
+  inputPrompt.innerHTML = `
+    <div style="color: #d4d4d4; margin-bottom: 5px;">
+      <i class="bi bi-keyboard me-2"></i>Enter value for '<span style="color: #569cd6;">${variableName}</span>':
+    </div>
+    <div style="display: flex; gap: 10px; align-items: center;">
+      <input type="text" id="input-${variableName}" style="flex: 1; padding: 5px; background: #1e1e1e; border: 1px solid #3c3c3c; color: #d4d4d4; border-radius: 3px;" placeholder="Enter value..." />
+      <button onclick="submitInput('${variableName}')" style="padding: 5px 10px; background: #007ACC; color: white; border: none; border-radius: 3px; cursor: pointer;">Submit</button>
+    </div>
+  `;
+  
+  consoleOutput.appendChild(inputPrompt);
+  
+  // Focus on the input field
+  setTimeout(() => {
+    const inputField = document.getElementById(`input-${variableName}`);
+    if (inputField) {
+      inputField.focus();
+      
+      // Handle Enter key
+      inputField.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+          submitInput(variableName);
+        }
+      });
+    }
+  }, 100);
+}
+
+// Submit input value and continue execution
+function submitInput(variableName) {
+  const inputField = document.getElementById(`input-${variableName}`);
+  if (!inputField) return;
+  
+  const value = inputField.value.trim();
+  if (!value) {
+    alert('Please enter a value!');
+    return;
+  }
+  
+  // Remove the input prompt
+  const inputPrompt = inputField.closest('div').parentElement;
+  if (inputPrompt) {
+    inputPrompt.remove();
+  }
+  
+  // Continue execution with the input
+  const inputs = {};
+  inputs[variableName] = value;
+  
+  // Show what was entered
+  const consoleOutput = document.getElementById('console-output');
+  const inputDisplay = document.createElement('div');
+  inputDisplay.style.cssText = 'color: #4EC9B0; padding: 5px 0;';
+  inputDisplay.innerHTML = `> ${variableName} = "${value}"`;
+  consoleOutput.appendChild(inputDisplay);
+  
+  runCode(inputs);
 }
 
 // Load an example file
