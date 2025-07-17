@@ -72,17 +72,12 @@ function runCode(inputs = {}) {
 function handleInputRequest(variableName, currentInputs) {
   const consoleOutput = document.getElementById('console-output');
   
-  // Create input prompt in console
+  // Create simple input prompt like a normal IDE
   const inputPrompt = document.createElement('div');
-  inputPrompt.style.cssText = 'background-color: #2d2d30; padding: 10px; margin: 5px 0; border-left: 3px solid #007ACC;';
+  inputPrompt.style.cssText = 'display: flex; align-items: center; padding: 5px 0; color: #d4d4d4;';
   inputPrompt.innerHTML = `
-    <div style="color: #d4d4d4; margin-bottom: 5px;">
-      <i class="bi bi-keyboard me-2"></i>Enter value for '<span style="color: #569cd6;">${variableName}</span>':
-    </div>
-    <div style="display: flex; gap: 10px; align-items: center;">
-      <input type="text" id="input-${variableName}" style="flex: 1; padding: 5px; background: #1e1e1e; border: 1px solid #3c3c3c; color: #d4d4d4; border-radius: 3px;" placeholder="Enter value..." />
-      <button onclick="submitInput('${variableName}')" style="padding: 5px 10px; background: #007ACC; color: white; border: none; border-radius: 3px; cursor: pointer;">Submit</button>
-    </div>
+    <span style="margin-right: 10px;">${variableName}:</span>
+    <input type="text" id="input-${variableName}" style="flex: 1; padding: 5px; background: #1e1e1e; border: 1px solid #3c3c3c; color: #d4d4d4; border-radius: 3px; max-width: 200px;" placeholder="Enter value..." />
   `;
   
   consoleOutput.appendChild(inputPrompt);
@@ -115,21 +110,14 @@ function submitInput(variableName) {
   }
   
   // Remove the input prompt
-  const inputPrompt = inputField.closest('div').parentElement;
+  const inputPrompt = inputField.closest('div');
   if (inputPrompt) {
     inputPrompt.remove();
   }
   
-  // Continue execution with the input
+  // Continue execution with the input - no display of input value
   const inputs = {};
   inputs[variableName] = value;
-  
-  // Show what was entered
-  const consoleOutput = document.getElementById('console-output');
-  const inputDisplay = document.createElement('div');
-  inputDisplay.style.cssText = 'color: #4EC9B0; padding: 5px 0;';
-  inputDisplay.innerHTML = `> ${variableName} = "${value}"`;
-  consoleOutput.appendChild(inputDisplay);
   
   runCode(inputs);
 }

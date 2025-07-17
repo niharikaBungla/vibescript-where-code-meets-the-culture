@@ -72,10 +72,26 @@
               <div class="editor-header bg-dark border-bottom border-secondary p-2">
                 <span class="text-white"><i class="bi bi-code-slash me-2"></i>main.vs</span>
               </div>
-              <div class="editor-container border border-secondary" style="height: 500px;">
-                <!-- Simple, reliable text editor that works like VS Code -->
+              <div class="editor-container border border-secondary" style="height: 500px; display: flex;">
+                <!-- Line numbers -->
+                <div id="line-numbers" style="
+                  background-color: #1e1e1e; 
+                  color: #858585; 
+                  font-family: 'Fira Code', monospace; 
+                  font-size: 14px; 
+                  line-height: 21px; 
+                  padding: 10px 8px; 
+                  border-right: 1px solid #3c3c3c;
+                  user-select: none;
+                  min-width: 50px;
+                  text-align: right;
+                  overflow: hidden;
+                  white-space: pre;
+                ">1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9<br>10<br>11<br>12<br>13<br>14<br>15<br>16<br>17<br>18<br>19<br>20</div>
+                
+                <!-- Code editor -->
                 <textarea id="code-editor-area" class="form-control h-100 border-0 rounded-0" 
-                  style="font-family: 'Fira Code', monospace; resize: none; background-color: #1e1e1e; color: #d4d4d4; font-size: 14px; line-height: 1.5;"
+                  style="font-family: 'Fira Code', monospace; resize: none; background-color: #1e1e1e; color: #d4d4d4; font-size: 14px; line-height: 21px; flex: 1;"
                   placeholder="// Write your VibeScript code here...">// Welcome to VibeScript - Where Code Meets Culture!
 
 spill_the_tea "Hello, World!";

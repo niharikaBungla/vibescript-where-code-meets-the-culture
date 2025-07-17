@@ -157,8 +157,7 @@ class Interpreter:
         if hasattr(self, 'input_values') and node.variable in self.input_values:
             value = self.input_values[node.variable]
             self.environment.assign(node.variable, value)
-            # Show what input was used
-            self.output_stream.write(f"Input for '{node.variable}': {value}\n")
+            # Don't show input message - just silently assign the value
             self.output = self.output_stream.getvalue()
         else:
             # Request input from user

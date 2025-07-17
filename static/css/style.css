@@ -139,10 +139,8 @@ body {
 }
 
 .success-output {
-  color: var(--vs-success);
-  background-color: rgba(61, 215, 92, 0.1);
+  color: var(--vs-text);
   padding: 10px;
-  border-left: 3px solid var(--vs-success);
   margin-bottom: 10px;
 }
 

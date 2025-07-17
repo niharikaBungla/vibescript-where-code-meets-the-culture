@@ -124,36 +124,41 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
     
-    // Add line numbering visually (simple implementation)
-    codeArea.addEventListener('scroll', updateLineHighlighting);
-    codeArea.addEventListener('input', updateLineHighlighting);
+    // Add line numbering functionality
+    codeArea.addEventListener('scroll', updateLineNumbers);
+    codeArea.addEventListener('input', updateLineNumbers);
     
-    // Initial line highlighting
-    setTimeout(updateLineHighlighting, 100);
+    // Initial line numbering
+    setTimeout(updateLineNumbers, 100);
   }
 });
 
-// Function to update line highlighting (provides a more VS Code feel)
-function updateLineHighlighting() {
+// Function to update line numbers
+function updateLineNumbers() {
   const codeArea = document.getElementById('code-editor-area');
-  if (!codeArea) return;
+  const lineNumbersDiv = document.getElementById('line-numbers');
   
-  // Update current line highlighting
+  if (!codeArea || !lineNumbersDiv) return;
+  
+  // Count lines in the textarea
   const lines = codeArea.value.split('\n');
-  const pos = codeArea.selectionStart;
-  let currentLine = 0;
-  let charCount = 0;
+  const lineCount = lines.length;
   
-  for (let i = 0; i < lines.length; i++) {
-    charCount += lines[i].length + 1; // +1 for the newline
-    if (charCount > pos) {
-      currentLine = i;
-      break;
-    }
+  // Generate line numbers with exact spacing to match textarea
+  let lineNumbers = [];
+  for (let i = 1; i <= Math.max(lineCount, 20); i++) {
+    lineNumbers.push(i.toString());
   }
   
-  // Visual feedback for current line (VS Code style)
-  codeArea.style.background = '#1e1e1e';
+  // Use the same line spacing as textarea
+  lineNumbersDiv.innerHTML = lineNumbers.join('<br>');
+  
+  // Sync scroll position exactly
+  lineNumbersDiv.scrollTop = codeArea.scrollTop;
+  
+  // Ensure same padding and margin as textarea
+  const codeAreaStyle = window.getComputedStyle(codeArea);
+  lineNumbersDiv.style.paddingTop = codeAreaStyle.paddingTop;
 }
 
 // Function to get the current code from the editor
